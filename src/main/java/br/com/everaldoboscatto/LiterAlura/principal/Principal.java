@@ -1,7 +1,6 @@
 package br.com.everaldoboscatto.LiterAlura.principal;
 
-import br.com.everaldoboscatto.LiterAlura.models.Dados;
-import br.com.everaldoboscatto.LiterAlura.models.DadosLivro;
+import br.com.everaldoboscatto.LiterAlura.model.*;
 import br.com.everaldoboscatto.LiterAlura.service.RequestAPI;
 import br.com.everaldoboscatto.LiterAlura.service.ConvertData;
 
@@ -14,6 +13,7 @@ public class Principal {
     private RequestAPI consumoApi = new RequestAPI();
     private ConvertData conversor = new ConvertData();
     private final String ENDERECO = "https://gutendex.com/books/?search=";
+    private List<DadosLivro> results;
     private List<DadosLivro> dadosLivros = new ArrayList<>();
 
     public void exibeMenu() {
@@ -66,33 +66,13 @@ public class Principal {
            System.out.println(json);
            Dados dados = conversor.obterDados(json, Dados.class);
            System.out.println(dados);
-       }
 
-
-
-/*
-       private void buscarLivroWeb() {
-           DadosLivro dados = obterDadosLivro();
-           Livro livro =  new Livro(dados);
-           //Livro.add(dados);
-           //repositorio.save(serie);
-           System.out.println("\nImprimindo dados do livro buscado:\n");
-       }
-
-
-       private DadosLivro obterDadosLivro() {
-           System.out.println("Digite o nome do livro que deseja buscar:");
-           var nomeLivro = leitura.nextLine();
-           var json = consumoApi.obterDados(ENDERECO + nomeLivro.replace(" ", "+"));
+           json = consumoApi.obterDados(ENDERECO + nomeLivro.replace(" ", "+"));
+           DadosAutor autor = conversor.obterDados(json, DadosAutor.class);
            System.out.println(json);
-           Dados dados = conversor.obterDados(json, Dados.class);
-           return dados;
+           System.out.println(autor);
+
        }
-
-
-
- */
-
 
     private void listarLivrosArmazenados() {
         System.out.println("Mostrar aqui todos os livros armazenados no repositório.");
