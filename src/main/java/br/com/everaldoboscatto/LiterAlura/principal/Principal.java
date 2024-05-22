@@ -110,7 +110,11 @@ public class Principal {
 
     }
     private void listarAutoresArmazenados() {
-        System.out.println("Listar aqui livros armazendados.");
+        List<Autor> autores = repositorio.obterDadosAutor();
+        autores.stream()
+                .sorted(Comparator.comparing(Autor::getNome))
+                .forEach(a -> System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
+                        a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
     }
 
     private void listarAutoresVivos() {

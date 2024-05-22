@@ -12,5 +12,11 @@ import java.util.Optional;
 public interface LivroRepository extends JpaRepository<Livro, Long> {
     Optional<Livro> findByTituloContainingIgnoreCase(String nomeLivro);
 
+    @Query("SELECT a FROM Livro b JOIN b.autores a")
+    List<Autor> obterDadosAutor();
 
+    @Query("SELECT a FROM Livro b JOIN b.autores a WHERE anoDeNascimento >= :date")
+    List<Autor> obterDadosAutorLiveAfter(Integer date);
+
+    List<Livro> findByIdiomas(Idiomas idomas);
 }
