@@ -5,10 +5,7 @@ import br.com.everaldoboscatto.LiterAlura.repository.LivroRepository;
 import br.com.everaldoboscatto.LiterAlura.service.RequestAPI;
 import br.com.everaldoboscatto.LiterAlura.service.ConvertData;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
@@ -19,6 +16,12 @@ public class Principal {
     private Livro livro;
     private LivroRepository repositorio;
     private String nomeDoLivro;
+    private List<Livro> livros;
+
+    public Principal(LivroRepository repositorio) {
+
+        this.repositorio = repositorio;
+    }
 
     public void exibeMenu() {
         var opcao = -1;
@@ -91,7 +94,7 @@ public class Principal {
 
         if ( livro.isPresent() ) {
             var l = livro.get();
-            //repositorio.save(l);
+            repositorio.save(l);
             System.out.println(l);
         } else {
             System.out.println("\nLivro não encontrado!\n");
@@ -99,7 +102,11 @@ public class Principal {
         return livro;
     }
     private void listarLivrosArmazenados() {
-        livrosBuscados.forEach(System.out::println);
+        livros = repositorio.findAll();
+
+        livros.stream()
+                .sorted(Comparator.comparing(Livro::getTitulo))
+                .forEach(System.out::println);
 
     }
     private void listarAutoresArmazenados() {
