@@ -1,11 +1,13 @@
 package br.com.everaldoboscatto.LiterAlura.principal;
 
 import br.com.everaldoboscatto.LiterAlura.model.*;
+import br.com.everaldoboscatto.LiterAlura.repository.LivroRepository;
 import br.com.everaldoboscatto.LiterAlura.service.RequestAPI;
 import br.com.everaldoboscatto.LiterAlura.service.ConvertData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
@@ -14,6 +16,9 @@ public class Principal {
     private ConvertData conversor = new ConvertData();
     private final String BASE_URL = "https://gutendex.com/books/?search=";
     private List<Dados> livrosBuscados = new ArrayList<Dados>(); // Armazena os livros buscados
+    private Livro livro;
+    private LivroRepository repositorio;
+    private String nomeDoLivro;
 
     public void exibeMenu() {
         var opcao = -1;
@@ -34,8 +39,8 @@ public class Principal {
             leitura.nextLine();
             switch (opcao) {
                 case 1:
-                    buscarLivroWeb();
-                    break;
+                    obterDadosLivro();
+                break;
                 case 2:
                     listarLivrosArmazenados();
                     break;
@@ -58,25 +63,45 @@ public class Principal {
         }
     }
 
-    private void buscarLivroWeb() {
-        Dados dados = getDadosLivro();
-        livrosBuscados.add(dados);
-        System.out.println(dados);
+    private String solicitarDados() {
+        System.out.println("Digite o nome do livro para a busca");
+        nomeDoLivro = leitura.nextLine();
+        return nomeDoLivro;
     }
-
-    private Dados getDadosLivro() {
-        System.out.println("Digite o nome do livro que deseja buscar:");
-        var nomeLivro = leitura.nextLine();
-        var json = consumoApi.obterDados(BASE_URL + nomeLivro.replace(" ", "+"));
-        System.out.println(json);
-        Dados dados = conversor.obterDados(json, Dados.class);
+    private Dados buscarDadosAPI(String nomeDoLivro) {
+        var json = consumoApi.obterDados(BASE_URL + nomeDoLivro.replace(" ", "+"));
+        var dados = conversor.obterDados(json, Dados.class);
+        System.out.println(dados);
         return dados;
     }
-
-    private void listarLivrosArmazenados() {
-        livrosBuscados.forEach(System.out::println);
+    private Optional<Livro> obterInfoLivro(Dados dadosLivro, String nomeLivro ) {
+        Optional<Livro> livros = dadosLivro.results().stream()
+                .filter(l -> l.titulo().toLowerCase().contains(nomeLivro.toLowerCase()))
+                .map(l -> new Livro(l.titulo(), l.idiomas(), l.numeroDownloads(), l.autores()))
+                .findFirst();
+        return livros;
     }
 
+    private Optional<Livro> obterDadosLivro () {
+        String tituloLivro = solicitarDados();
+
+        Dados infoLivro = buscarDadosAPI(tituloLivro);
+
+        Optional<Livro> livro = obterInfoLivro(infoLivro, tituloLivro);
+
+        if ( livro.isPresent() ) {
+            var l = livro.get();
+            //repositorio.save(l);
+            System.out.println(l);
+        } else {
+            System.out.println("\nLivro não encontrado!\n");
+        }
+        return livro;
+    }
+    private void listarLivrosArmazenados() {
+        livrosBuscados.forEach(System.out::println);
+
+    }
     private void listarAutoresArmazenados() {
         System.out.println("Listar aqui livros armazendados.");
     }
@@ -87,14 +112,5 @@ public class Principal {
 
     private void listarLivrosPorIdioma() {
         System.out.println("Mostrar aqui os livros do idioma escolhido.");
-
     }
 }
-
-    
-//Dados[results=[DadosLivro[titulo=Dom Casmurro, atuores=[DadosAutor[nome=Machado de Assis, anoDeNascimento=1839, anoDeFalecimento=1908]],
-// numeroDownloads=915]]]
-
-
-//Dados[results=[DadosLivro[titulo=Os Sinos: Poesia Narrativa, autores=[DadosAutor[nome=Proença, Raul Sangreman, anoDeNascimento=1884, anoDeFalecimento=1941]],
-// idiomas=[pt], numeroDownloads=54]]]
