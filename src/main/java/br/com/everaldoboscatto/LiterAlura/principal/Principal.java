@@ -12,9 +12,8 @@ public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private RequestAPI consumoApi = new RequestAPI();
     private ConvertData conversor = new ConvertData();
-    private final String ENDERECO = "https://gutendex.com/books/?search=";
-    private List<DadosLivro> results;
-    private List<DadosLivro> dadosLivros = new ArrayList<>();
+    private final String BASE_URL = "https://gutendex.com/books/?search=";
+    private List<Dados> livrosBuscados = new ArrayList<Dados>(); // Armazena os livros buscados
 
     public void exibeMenu() {
         var opcao = -1;
@@ -55,27 +54,27 @@ public class Principal {
                     break;
                 default:
                     System.out.println("\nOpçao inválida!");
-            }       
-        }                
+            }
+        }
     }
 
-       private void buscarLivroWeb() {
-           System.out.println("Digite o nome do livro que deseja buscar:");
-           var nomeLivro = leitura.nextLine();
-           var json = consumoApi.obterDados(ENDERECO + nomeLivro.replace(" ", "+"));
-           System.out.println(json);
-           Dados dados = conversor.obterDados(json, Dados.class);
-           System.out.println(dados);
+    private void buscarLivroWeb() {
+        Dados dados = getDadosLivro();
+        livrosBuscados.add(dados);
+        System.out.println(dados);
+    }
 
-           json = consumoApi.obterDados(ENDERECO + nomeLivro.replace(" ", "+"));
-           DadosAutor autor = conversor.obterDados(json, DadosAutor.class);
-           System.out.println(json);
-           System.out.println(autor);
-
-       }
+    private Dados getDadosLivro() {
+        System.out.println("Digite o nome do livro que deseja buscar:");
+        var nomeLivro = leitura.nextLine();
+        var json = consumoApi.obterDados(BASE_URL + nomeLivro.replace(" ", "+"));
+        System.out.println(json);
+        Dados dados = conversor.obterDados(json, Dados.class);
+        return dados;
+    }
 
     private void listarLivrosArmazenados() {
-        System.out.println("Mostrar aqui todos os livros armazenados no repositório.");
+        livrosBuscados.forEach(System.out::println);
     }
 
     private void listarAutoresArmazenados() {
@@ -90,7 +89,12 @@ public class Principal {
         System.out.println("Mostrar aqui os livros do idioma escolhido.");
 
     }
-
 }
 
     
+//Dados[results=[DadosLivro[titulo=Dom Casmurro, atuores=[DadosAutor[nome=Machado de Assis, anoDeNascimento=1839, anoDeFalecimento=1908]],
+// numeroDownloads=915]]]
+
+
+//Dados[results=[DadosLivro[titulo=Os Sinos: Poesia Narrativa, autores=[DadosAutor[nome=Proença, Raul Sangreman, anoDeNascimento=1884, anoDeFalecimento=1941]],
+// idiomas=[pt], numeroDownloads=54]]]
