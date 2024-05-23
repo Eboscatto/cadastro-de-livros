@@ -18,8 +18,8 @@ public class Principal {
     private String nomeDoLivro;
     private List<Livro> livros;
 
-    public Principal(LivroRepository repositorio) {
 
+    public Principal(LivroRepository repositorio) {
         this.repositorio = repositorio;
     }
 
@@ -40,6 +40,7 @@ public class Principal {
             System.out.println("Opção: ");
             opcao = leitura.nextInt();
             leitura.nextLine();
+
             switch (opcao) {
                 case 1:
                     obterDadosLivro();
@@ -116,19 +117,40 @@ public class Principal {
                 .forEach(a -> System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
                         a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
     }
-    private void listarAutoresVivos() {
+
+    private int solicitarAno() {
         System.out.println("Digite o ano para o qual deseja saber um autor vivo:");
-        var ano = leitura.nextInt();
-        leitura.nextLine();
 
-        List<Autor> autorDados = repositorio.obterAutorVivoEm(ano);
-
-        autorDados.stream()
-                .sorted(Comparator.comparing(Autor::getNome))
-                .forEach(a -> System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
-                        a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
+        while (true) {
+            try {
+                int ano = leitura.nextInt();
+                leitura.nextLine(); // Limpa o buffer de entrada
+                return ano;
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número inteiro.");
+                leitura.nextLine(); // Limpa o buffer de entrada
+            }
+        }
     }
 
+    private void listarAutoresVivos() {
+        int ano = solicitarAno();
+
+        if (ano < 0) {
+            System.out.println("Ano inválido!");
+            return;
+        }
+
+        List<Autor> autoresVivosEmAno = repositorio.obterAutoresVivosEmAno(ano);
+        autoresVivosEmAno.stream()
+                .sorted(Comparator.comparing(Autor::getNome))
+                .forEach(this::exibirAutor);
+    }
+
+    private void exibirAutor(Autor autor) {
+        System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
+                autor.getNome(), autor.getAnoDeNascimento(), autor.getAnoDeFalecimento());
+    }
     private void listarLivrosPorIdioma() {
         System.out.println("Mostrar aqui os livros do idioma escolhido.");
     }

@@ -15,8 +15,8 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
     @Query("SELECT a FROM Livro b JOIN b.autores a")
     List<Autor> obterDadosAutor();
 
-    //a.anoDeNascimento BETWEEN :startYear AND :endYear"
-    @Query("SELECT a FROM Livro l JOIN l.autores a WHERE a.anoDeNascimento >= :ano")
-    List<Autor> obterAutorVivoEm(Integer ano);
-
+    @Query("SELECT a FROM Autor a " +
+            "WHERE a.anoDeNascimento <= :ano " +
+            "AND (a.anoDeFalecimento IS NULL OR a.anoDeFalecimento >= :ano)")
+    List<Autor> obterAutoresVivosEmAno(int ano);
 }
