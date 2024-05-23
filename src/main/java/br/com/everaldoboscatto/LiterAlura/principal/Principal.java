@@ -116,9 +116,17 @@ public class Principal {
                 .forEach(a -> System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
                         a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
     }
-
     private void listarAutoresVivos() {
-        System.out.println("Mostrar aqui os nomes dos autores.");
+        System.out.println("Digite o ano para o qual deseja saber um autor vivo:");
+        var ano = leitura.nextInt();
+        leitura.nextLine();
+
+        List<Autor> autorDados = repositorio.obterAutorVivoEm(ano);
+
+        autorDados.stream()
+                .sorted(Comparator.comparing(Autor::getNome))
+                .forEach(a -> System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
+                        a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
     }
 
     private void listarLivrosPorIdioma() {
