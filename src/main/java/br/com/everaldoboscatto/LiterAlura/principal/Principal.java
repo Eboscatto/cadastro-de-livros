@@ -12,14 +12,12 @@ public class Principal {
     private RequestAPI consumoApi = new RequestAPI();
     private ConvertData conversor = new ConvertData();
     private final String BASE_URL = "https://gutendex.com/books/?search=";
-    private List<Dados> livrosBuscados = new ArrayList<Dados>(); // Armazena os livros buscados
-    private Livro livro;
     private LivroRepository repositorio;
     private String nomeDoLivro;
     private List<Livro> livros;
 
-
     public Principal(LivroRepository repositorio) {
+
         this.repositorio = repositorio;
     }
 
@@ -44,7 +42,7 @@ public class Principal {
             switch (opcao) {
                 case 1:
                     obterDadosLivro();
-                break;
+                    break;
                 case 2:
                     listarLivrosArmazenados();
                     break;
@@ -52,7 +50,7 @@ public class Principal {
                     listarAutoresArmazenados();
                     break;
                 case 4:
-                    listarAutoresVivos();
+                    //listarAutoresVivos();
                     break;
                 case 5:
                     listarLivrosPorIdioma();
@@ -72,13 +70,15 @@ public class Principal {
         nomeDoLivro = leitura.nextLine();
         return nomeDoLivro;
     }
+
     private Dados buscarDadosAPI(String nomeDoLivro) {
         var json = consumoApi.obterDados(BASE_URL + nomeDoLivro.replace(" ", "+"));
         var dados = conversor.obterDados(json, Dados.class);
         System.out.println(dados);
         return dados;
     }
-    private Optional<Livro> obterInfoLivro(Dados dadosLivro, String nomeLivro ) {
+
+    private Optional<Livro> obterInfoLivro(Dados dadosLivro, String nomeLivro) {
         Optional<Livro> livros = dadosLivro.results().stream()
                 .filter(l -> l.titulo().toLowerCase().contains(nomeLivro.toLowerCase()))
                 .map(l -> new Livro(l.titulo(), l.idiomas(), l.numeroDownloads(), l.autores()))
@@ -86,14 +86,14 @@ public class Principal {
         return livros;
     }
 
-    private Optional<Livro> obterDadosLivro () {
+    private Optional<Livro> obterDadosLivro() {
         String tituloLivro = solicitarDados();
 
         Dados infoLivro = buscarDadosAPI(tituloLivro);
 
         Optional<Livro> livro = obterInfoLivro(infoLivro, tituloLivro);
 
-        if ( livro.isPresent() ) {
+        if (livro.isPresent()) {
             var l = livro.get();
             repositorio.save(l);
             System.out.println(l);
@@ -102,14 +102,15 @@ public class Principal {
         }
         return livro;
     }
+
     private void listarLivrosArmazenados() {
         livros = repositorio.findAll();
 
         livros.stream()
                 .sorted(Comparator.comparing(Livro::getTitulo))
                 .forEach(System.out::println);
-
     }
+
     private void listarAutoresArmazenados() {
         List<Autor> autores = repositorio.obterDadosAutor();
         autores.stream()
@@ -124,11 +125,11 @@ public class Principal {
         while (true) {
             try {
                 int ano = leitura.nextInt();
-                leitura.nextLine(); // Limpa o buffer de entrada
+                leitura.nextLine();
                 return ano;
             } catch (InputMismatchException e) {
                 System.out.println("Entrada inválida. Por favor, digite um número inteiro.");
-                leitura.nextLine(); // Limpa o buffer de entrada
+                leitura.nextLine();
             }
         }
     }
@@ -151,7 +152,26 @@ public class Principal {
         System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
                 autor.getNome(), autor.getAnoDeNascimento(), autor.getAnoDeFalecimento());
     }
+
     private void listarLivrosPorIdioma() {
-        System.out.println("Mostrar aqui os livros do idioma escolhido.");
+        String idiomasList = """
+                Escolha o idioma do livro que deseja buscar                
+                en - Inglês
+                es - Espanhol
+                fr - Francês                
+                pt - Português
+                                
+                """;
+        System.out.println(idiomasList);
+        System.out.println("Opção: ");
+        String text = leitura.nextLine();
+
+        var idoma = Idiomas.fromString(text);
+
+        List<Livro> livroIdioma = repositorio.findByIdiomas(idoma);
+
+        livroIdioma.stream()
+                .forEach(System.out::println);
+
     }
 }

@@ -19,4 +19,6 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
             "WHERE a.anoDeNascimento <= :ano " +
             "AND (a.anoDeFalecimento IS NULL OR a.anoDeFalecimento >= :ano)")
     List<Autor> obterAutoresVivosEmAno(int ano);
+
+    List<Livro> findByIdiomas(Idiomas idoma);
 }
