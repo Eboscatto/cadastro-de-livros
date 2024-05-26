@@ -1,25 +1,27 @@
 package br.com.everaldoboscatto.LiterAlura.principal;
 
 import br.com.everaldoboscatto.LiterAlura.model.*;
+import br.com.everaldoboscatto.LiterAlura.repository.AutorRepository;
 import br.com.everaldoboscatto.LiterAlura.repository.LivroRepository;
 import br.com.everaldoboscatto.LiterAlura.service.RequestAPI;
-import br.com.everaldoboscatto.LiterAlura.service.ConvertData;
+import br.com.everaldoboscatto.LiterAlura.service.ConverteDados;
 
 import java.util.*;
 
 public class Principal {
     private Scanner leitura = new Scanner(System.in);
     private RequestAPI consumoApi = new RequestAPI();
-    private ConvertData conversor = new ConvertData();
+    private ConverteDados conversor = new ConverteDados();
     private final String BASE_URL = "https://gutendex.com/books/?search=";
     private LivroRepository repositorio;
+    private AutorRepository autorRepository;
     private String nomeDoLivro;
     private List<Livro> livros;
-
-    public Principal(LivroRepository repositorio) {
-
+    public Principal(AutorRepository autorRepository, LivroRepository repositorio) {
         this.repositorio = repositorio;
+        this.autorRepository = autorRepository;
     }
+
 
     public void exibeMenu() {
         var opcao = -1;
@@ -50,7 +52,7 @@ public class Principal {
                     listarAutoresArmazenados();
                     break;
                 case 4:
-                    //listarAutoresVivos();
+                    listarAutoresVivos();
                     break;
                 case 5:
                     listarLivrosPorIdioma();
@@ -81,11 +83,10 @@ public class Principal {
     private Optional<Livro> obterInfoLivro(Dados dadosLivro, String nomeLivro) {
         Optional<Livro> livros = dadosLivro.results().stream()
                 .filter(l -> l.titulo().toLowerCase().contains(nomeLivro.toLowerCase()))
-                .map(l -> new Livro(l.titulo(), l.idiomas(), l.numeroDownloads(), l.autores()))
+                .map(b -> new Livro(b.titulo(), b.idiomas(), b.numeroDownloads(), b.autores()))
                 .findFirst();
         return livros;
     }
-
     private Optional<Livro> obterDadosLivro() {
         String tituloLivro = solicitarDados();
 
@@ -94,8 +95,21 @@ public class Principal {
         Optional<Livro> livro = obterInfoLivro(infoLivro, tituloLivro);
 
         if (livro.isPresent()) {
-            var l = livro.get();
+            Livro l = livro.get();
+            Autor autor = l.getAutor();
+            System.out.println("\nLivro já existe no banco de dados!");
+
+            // Verifica se o autor já existe no banco de dados
+            Optional<Autor> autorExistente = autorRepository.findByNome(autor.getNome());
+            if (autorExistente.isEmpty()) {
+                // Salva o autor antes de salvar o livro
+                autorRepository.save(autor);
+            } else {
+                // Atualiza o autor do livro com o autor existente
+                l.setAutor(autorExistente.get());
+            }
             repositorio.save(l);
+            System.out.println("Livro Encontrado:");
             System.out.println(l);
         } else {
             System.out.println("\nLivro não encontrado!\n");
@@ -111,6 +125,21 @@ public class Principal {
                 .forEach(System.out::println);
     }
 
+    public Principal(LivroRepository livroRepository, AutorRepository autorRepository) {
+        this.repositorio = livroRepository;
+        this.autorRepository = autorRepository;
+    }
+
+    private void listarAutoresArmazenados() {
+        List<Autor> autores = autorRepository.findAll();
+        autores.stream()
+                .sorted(Comparator.comparing(Autor::getNome))
+                .forEach(a -> System.out.printf("Autor: %s Nascido: %s Falecido: %s\n",
+                        a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
+    }
+
+
+    /*
     private void listarAutoresArmazenados() {
         List<Autor> autores = repositorio.obterDadosAutor();
         autores.stream()
@@ -119,6 +148,10 @@ public class Principal {
                         a.getNome(), a.getAnoDeNascimento(), a.getAnoDeFalecimento()));
     }
 
+
+
+
+     */
     private int solicitarAno() {
         System.out.println("Digite o ano para o qual deseja saber um autor vivo:");
 

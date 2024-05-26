@@ -1,5 +1,4 @@
 package br.com.everaldoboscatto.LiterAlura.model;
-
 public enum Idiomas {
     PORTUGUESE("pt"),
     ESPANISH("es"),

@@ -5,15 +5,19 @@ import br.com.everaldoboscatto.LiterAlura.model.Idiomas;
 import br.com.everaldoboscatto.LiterAlura.model.Livro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface LivroRepository extends JpaRepository<Livro, Long> {
-    //Optional<Livro> findByTituloContainingIgnoreCase(String nomeLivro);
+    Optional<Livro> findByTituloContainingIgnoreCase(String nomeLivro);
 
-    @Query("SELECT a FROM Livro b JOIN b.autores a")
-    List<Autor> obterDadosAutor();
+    //@Query("SELECT a FROM Livro b JOIN b.autores a")
+    //List<Autor> obterDadosAutor();
+
 
     @Query("SELECT a FROM Autor a " +
             "WHERE a.anoDeNascimento <= :ano " +
@@ -21,4 +25,5 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
     List<Autor> obterAutoresVivosEmAno(int ano);
 
     List<Livro> findByIdiomas(Idiomas idoma);
+
 }

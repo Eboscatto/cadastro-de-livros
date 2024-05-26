@@ -2,6 +2,8 @@ package br.com.everaldoboscatto.LiterAlura.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "tb_autores")
 public class Autor {
@@ -11,18 +13,19 @@ public class Autor {
     private String nome;
     private Integer anoDeNascimento;
     private Integer anoDeFalecimento;
-    @ManyToOne
-    private Livro livro;
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Livro> livros;
+
     public Autor(){
     }
     public Autor(Autor autor){
 
     }
-    public Autor(String nome, Integer anoDeNascimento, Integer anoDeFalecimento, Livro livro){
+    public Autor(String nome, Integer anoDeNascimento, Integer anoDeFalecimento){
         this.nome = nome;
         this.anoDeNascimento = anoDeNascimento;
         this.anoDeFalecimento = anoDeFalecimento;
-        this.livro = livro;
+        this.livros = livros;
     }
 
     public Long getId() {
@@ -60,12 +63,13 @@ public class Autor {
         this.anoDeFalecimento = anoDeFalecimento;
     }
 
-    public Livro getLivro() {
-        return livro;
+    public List<Livro> getLivros() {
+        return livros;
     }
 
-    public void setLivro(Livro livro) {
-        this.livro = livro;
+    public void setLivro(List<Livro> livros) {
+        //livros.forEach(a -> a.setAutor(this));
+        this.livros = livros;
     }
 
     @Override

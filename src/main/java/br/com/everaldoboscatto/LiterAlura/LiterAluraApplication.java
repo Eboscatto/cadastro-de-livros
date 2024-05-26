@@ -1,6 +1,8 @@
 package br.com.everaldoboscatto.LiterAlura;
 
 import br.com.everaldoboscatto.LiterAlura.principal.Principal;
+import br.com.everaldoboscatto.LiterAlura.principal.Principal;
+import br.com.everaldoboscatto.LiterAlura.repository.AutorRepository;
 import br.com.everaldoboscatto.LiterAlura.repository.LivroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -11,12 +13,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LiterAluraApplication implements CommandLineRunner {
 	@Autowired
 	private LivroRepository repositorio;
+	@Autowired
+	private AutorRepository autorRepository;
 	public static void main(String[] args) {
-			SpringApplication.run(LiterAluraApplication.class, args);
+		SpringApplication.run(LiterAluraApplication.class, args);
 	}
-    @Override
+	@Override
 	public void run(String... args) throws Exception {
-		Principal principal = new Principal(repositorio);
+		Principal principal = new Principal(repositorio, autorRepository);
 		principal.exibeMenu();
 	}
 }

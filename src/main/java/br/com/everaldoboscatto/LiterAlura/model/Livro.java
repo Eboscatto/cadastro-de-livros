@@ -1,8 +1,6 @@
 package br.com.everaldoboscatto.LiterAlura.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.persistence.*;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,44 +14,52 @@ public class Livro {
 
     @Column(unique = true)
     private String titulo;
-    @OneToMany(mappedBy = "livro", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Autor> autores;
+   @ManyToOne
+    private Autor autor;
 
     @Enumerated(EnumType.STRING)
     private Idiomas idiomas;
     private Integer numeroDownloads;
 
     public Livro(){
-
     }
 
-    public Livro(DadosLivro dados) {
 
+    public Livro(DadosLivro dados, Autor autor) {
+        this.titulo = dados.titulo();
+        this.autor = autor;
+        this.idiomas = Idiomas.fromString(dados.idiomas().get(0));
+        this.numeroDownloads = dados.numeroDownloads();
     }
+
     public Livro(List<DadosLivro> results) {
-
+        for (DadosLivro dados : results) {
+            Autor autor = new Autor(dados.autores().get(0).nome(), dados.autores().get(0).anoDeNascimento(), dados.autores().get(0).anoDeFalecimento());
+            Livro livro = new Livro(dados, autor);
+            // Adicione o livro à lista de livros do autor
+            autor.getLivros().add(livro);
+        }
     }
 
     public Livro(String tiulo, List<String> idiomas, Integer numeroDownloads,  List<DadosAutor> autores) {
         this.titulo = tiulo;
         this.idiomas = Idiomas.fromString(idiomas.get(0));
         this.numeroDownloads = numeroDownloads;
-        this.autores = new ArrayList<>();
-        for (DadosAutor dadosAutor : autores) {
-            Autor autor = new Autor(dadosAutor.nome(), dadosAutor.anoDeNascimento(), dadosAutor.anoDeFalecimento(), this);
-            this.autores.add(autor);
+        Autor autor = new Autor(autores.get(0).nome(), autores.get(0).anoDeNascimento(), autores.get(0).anoDeFalecimento());
+        this.autor = autor;
 
         }
-    }
 
     public Livro(Livro dados, Autor autor) {
         this.titulo = dados.titulo;
-        setAutores(autores);
+        this.autor = autor;
         this.idiomas = dados.idiomas;
         this.numeroDownloads = dados.numeroDownloads;
     }
 
+
     public Livro(Dados dados) {
+
     }
 
     public Long getId() {
@@ -72,13 +78,13 @@ public class Livro {
         this.titulo = titulo;
     }
 
-    public List<Autor> getAutores() {
-        return autores;
+    public Autor getAutor() {
+        return autor;
     }
 
-    public void setAutores(List<Autor> autores) {
-        autores.forEach(a -> a.setLivro(this));
-        this.autores = autores;
+
+    public void setAutor(Autor autor) {
+        this.autor = autor;
     }
 
     public Idiomas getIdiomas() {
@@ -100,8 +106,9 @@ public class Livro {
     @Override
     public String toString() {
         return "titulo='" + titulo + '\'' +
-                ", autores=" + autores +
+                ", autores=" + autor +
                 ", idioma='" + idiomas + '\'' +
                 ", numeroDownloads=" + numeroDownloads;
     }
+
 }
