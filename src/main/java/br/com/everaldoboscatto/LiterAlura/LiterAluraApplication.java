@@ -20,7 +20,7 @@ public class LiterAluraApplication implements CommandLineRunner {
 	}
 	@Override
 	public void run(String... args) throws Exception {
-		Principal principal = new Principal(repositorio, autorRepository);
+		Principal principal = new Principal(autorRepository, repositorio);
 		principal.exibeMenu();
 	}
 }

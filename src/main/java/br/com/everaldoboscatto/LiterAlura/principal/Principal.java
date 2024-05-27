@@ -17,7 +17,7 @@ public class Principal {
     private LivroRepository repositorio;
     private AutorRepository autorRepository;
     private String nomeDoLivro;
-    private List<Livro> livros;
+   // private List<Livro> livros;
     private AutorRepository livroRepository;
 
     // Injeta as dependêncicas no construtor da classe Principal
@@ -31,7 +31,7 @@ public class Principal {
         while (opcao != 0) {
             var menu = """       
                     00 - Sair                
-                    01 - Buscar livro pelo título
+                    01 - Buscar livro na web
                     02 - Lista livros armazenados
                     03 - Listar autores armazenados 
                     04 - Listar autores vivos em um determinado ano 
@@ -91,7 +91,7 @@ public class Principal {
         return dados;
     }
 
-    // Filtra os dados de um determinado livro
+    // Filtra os dados do livro buscado
     private Optional<Livro> obterInfoLivro(Dados dadosLivro, String nomeLivro) {
         Optional<Livro> livros = dadosLivro.results().stream()
                 .filter(l -> l.titulo()
@@ -113,14 +113,14 @@ public class Principal {
 
         Optional<Livro> livro = obterInfoLivro(infoLivro, tituloLivro);
 
-        // verifica se o livro já existe no banco de dados
+        // verifica se o livro já existe
         if (livro.isPresent()) {
             Livro l = livro.get();
             Autor autor = l.getAutor();
-            System.out.println("\nLivro já existe no banco de dados!");
 
             // Verifica se o autor já existe no banco de dados
             Optional<Autor> autorExistente = autorRepository.findByNome(autor.getNome());
+
             if (autorExistente.isEmpty()) {
                 // Salva o autor antes de salvar o livro
                 autorRepository.save(autor);
@@ -128,66 +128,61 @@ public class Principal {
                 // Atualiza o autor do livro com o autor existente
                 l.setAutor(autorExistente.get());
             }
-            // Salva o livro
+
+            // Salva o livro no banco de dados
             repositorio.save(l);
 
-            System.out.println("\nLivro Encontrado:");
             System.out.println(l);
+
+            System.out.println("Livro salvo com sucesso!");
         } else {
             System.out.println("\nLivro não encontrado!\n");
         }
         return livro;
     }
 
-    // Lista livros ordenados por título
+    // Método auxiliar para exibir as informaçãoes dos livros
+    public void exibeDadosLivros(Livro livro) {
+        var exibeLivro = "\n---------------- LIVRO ----------------" +
+                "\nTitulo: " + livro.getTitulo() +
+                "\nAutor: " + livro.getAutor().getNome() +
+                "\nIdioma: " + livro.getIdiomas() +
+                "\nNumero de downloads: " + livro.getNumeroDownloads() +
+                "\n--------------------------------------\n";
+        System.out.println(exibeLivro);
+    }
+
+    // Lista os livros cadastrados
     private void listarLivrosArmazenados() {
-        livros = repositorio.findAll();
-        System.out.println();
-
-        livros.stream()
-                .sorted(Comparator.comparing(Livro::getTitulo))
-                .forEach(System.out::println);
+        List<Livro> listaLivro = repositorio.findAll();
+        listaLivro.forEach(this::exibeDadosLivros);
     }
 
-    // Constrututor da classe principal
-    public Principal(LivroRepository livroRepository, AutorRepository autorRepository) {
-        this.repositorio = livroRepository;
-        this.autorRepository = autorRepository;
-    }
-    // Listar os 3 livros com maior número de downloads
-    private void listarTop3Downloads() {
-        List<Livro> livros = repositorio.findAll();
-        livros.stream()
-                .sorted(Comparator.comparingDouble(Livro::getNumeroDownloads).reversed())
-                .limit(3)
-                .forEach(l -> System.out.printf("\nTítulo: %s - Downloads: %.0f", l.getTitulo(), l.getNumeroDownloads()));
+    // Método auxiliar para exibir informações dos autores cadastrados
+    public void exibeDadosAutores(Autor autor) {
+        var exibeAutor = "\n---------------- AUTOR ----------------" +
+                "\nNome: " + autor.getNome() +
+                "\nNascido em: " + autor.getAnoDeNascimento()+
+                "\nFalecido em: " + autor.getAnoDeFalecimento() +
+                "\n--------------------------------------\n";
+        System.out.println(exibeAutor);
     }
 
-    // Lista autores armazenados ordenados por nome
+    // Lista autores ordenados por nome
     private void listarAutoresArmazenados() {
-        List<Autor> autores = autorRepository.findAll();
-        autores.stream()
-                .sorted(Comparator.comparing(Autor::getNome))
-                .forEach(a -> System.out.printf("\nAutor: %s Nascido: %s - Falecido: %s",
-                        a.getNome(),
-                        a.getAnoDeNascimento(),
-                        a.getAnoDeFalecimento()));
-    }
+        List<Autor> listaAutores = autorRepository.findAll();
 
+        if (listaAutores.isEmpty()){
+            System.out.println("\nNão há autor(es) armazenado(os)!");
+        } else {
+            System.out.println("\nAutor(es) encontrado(os):");
 
-    // Busca autor por um trecho do nome
-    private void listarAutorPeloNome() {
-        System.out.println("Digite um trecho do nome do episódio que deseja buscar");
-        var trechoNomeAutor = leitura.nextLine();
-        List<Autor> autorEncontrado = autorRepository.autorPorTrechoDoNome(trechoNomeAutor);
-        autorEncontrado.forEach(a ->
-                System.out.printf("\nAutor encontrado: %s Autor",
-                        a.getNome()));
-
-        if (autorEncontrado.isEmpty()) {
-            System.out.println("\nNão foi localizado nenhum autor com esse nome!");
+            listaAutores.stream()
+                    .sorted(Comparator.comparing(Autor::getNome));
+                    listaAutores.forEach(this::exibeDadosAutores);
         }
     }
+
     // Solicita a entrada de dados pelo usuário
    private int solicitarAno() {
         System.out.println("Digite o ano para o qual deseja saber um autor vivo:");
@@ -214,9 +209,15 @@ public class Principal {
         }
 
         List<Autor> autoresVivosEmAno = repositorio.obterAutoresVivosEmAno(ano);
+
+        System.out.println("\n---------------- Autor(es) encontrado(os) para o período informado: ----------------");
+
         autoresVivosEmAno.stream()
                 .sorted(Comparator.comparing(Autor::getNome))
                 .forEach(this::exibirAutor);
+        if (autoresVivosEmAno.isEmpty()) {
+            System.out.println("\nNão foi encontrado nenhum registro para o ano informado!");
+        }
     }
 
     // Lista autor(es) vivo(os) em um determinado ano
@@ -245,9 +246,55 @@ public class Principal {
 
         List<Livro> livroIdioma = repositorio.findByIdiomas(idoma);
 
-        System.out.println();
+        System.out.println("\n****** Livro(os) encontrado(os) para o idioma (" + idoma + ") ******");
 
-        livroIdioma.stream()
-                .forEach(System.out::println);
+        livroIdioma.forEach(this::exibeDadosLivros);
     }
+
+    // Listar os 3 livros com maior número de downloads
+    private void listarTop3Downloads() {
+        List<Livro> livros = repositorio.findAll();
+
+        System.out.println("\n---------------- Os três livros mais baixados são: ---------------- ");
+
+        livros.stream()
+                .sorted(Comparator.comparingDouble(Livro::getNumeroDownloads).reversed())
+                .limit(3)
+                .forEach(l -> System.out.printf("\nTítulo: %s - Downloads: %.0f", l.getTitulo(), l.getNumeroDownloads()));
+    }
+
+    // Método auxiliar para buscar os livros de um autor
+    private void exibeDadosLivroAutor(Livro livro) {
+        System.out.printf("Livro: %s\n", livro.getTitulo());
+    }
+
+    // Busca autor por um trecho do nome, e seus livros
+    private void listarAutorPeloNome() {
+        System.out.println("Digite um trecho do nome do autor que deseja buscar");
+        var trechoNomeAutor = leitura.nextLine();
+
+        List<Autor> autorEncontrado = autorRepository.autorPorTrechoDoNome(trechoNomeAutor);
+
+        if (autorEncontrado.isEmpty()) {
+            System.out.println("\nNão foi localizado nenhum autor com esse nome!");
+        } else {
+            autorEncontrado.forEach(a ->
+                    System.out.printf("\nAutor encontrado: %s\n",
+                            a.getNome()));
+
+            System.out.println("---------------- LIVROS ENCONTRADOS ---------------- ");
+
+            for (Autor autor : autorEncontrado) {
+                List<Livro> livrosDoAutor = autor.getLivros();
+
+                if (!livrosDoAutor.isEmpty()) {
+                    // System.out.println("\nAutor: %s\n", autor.getNome());
+                    livrosDoAutor.forEach(this::exibeDadosLivroAutor);
+                } else {
+                    System.out.printf("\nO autor %s não possui livros cadastrados.\n", autor.getNome());
+                }
+            }
+        }
+    }
+
 }

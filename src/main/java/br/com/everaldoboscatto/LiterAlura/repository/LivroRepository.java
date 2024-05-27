@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-// Realiza operações na Entidade Livro
+// Interage com o banco de dados, realiza operações na Entidade Livro
 @Repository
 public interface LivroRepository extends JpaRepository<Livro, Long> {
     Optional<Livro> findByTituloContainingIgnoreCase(String nomeLivro);
