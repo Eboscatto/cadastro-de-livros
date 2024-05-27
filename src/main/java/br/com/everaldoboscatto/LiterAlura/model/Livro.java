@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
-@Table(name = "tb_livros")
+@Table(name = "tb_livros") // Cria a tabela tb_livros no banco de dados
 public class Livro {
 
     @Id
@@ -15,41 +15,50 @@ public class Livro {
     @Column(unique = true)
     private String titulo;
    @ManyToOne
-    private Autor autor;
+    private Autor autor; // Mapeamento muitos para um
 
     @Enumerated(EnumType.STRING)
     private Idiomas idiomas;
-    private Integer numeroDownloads;
+    private Double numeroDownloads;
 
     public Livro(){
     }
 
-
+    // Atribui o Autor recebido como parâmetro à propriedade autor da Classe Livro
     public Livro(DadosLivro dados, Autor autor) {
         this.titulo = dados.titulo();
         this.autor = autor;
-        this.idiomas = Idiomas.fromString(dados.idiomas().get(0));
+        this.idiomas = Idiomas.fromString(dados.idiomas().get(0)); // Pega o primeiro idioma da lista de idiomas
         this.numeroDownloads = dados.numeroDownloads();
     }
 
+    // Itera sobre a lista results e, cria um novo livro para cada item e, atribui o Autor correspondente
     public Livro(List<DadosLivro> results) {
         for (DadosLivro dados : results) {
-            Autor autor = new Autor(dados.autores().get(0).nome(), dados.autores().get(0).anoDeNascimento(), dados.autores().get(0).anoDeFalecimento());
+            Autor autor = new Autor(dados.autores()
+                    .get(0).nome(), dados.autores()
+                    .get(0).anoDeNascimento(), dados.autores()
+                    .get(0).anoDeFalecimento()); // Pega o primeiro autor da lista de autores
             Livro livro = new Livro(dados, autor);
             // Adicione o livro à lista de livros do autor
             autor.getLivros().add(livro);
         }
     }
 
-    public Livro(String tiulo, List<String> idiomas, Integer numeroDownloads,  List<DadosAutor> autores) {
+    // Cria um novo Autor para cada DadosAutor na lista, e atribui à propriedade Autor da Classe Livro
+    public Livro(String tiulo, List<String> idiomas, Double numeroDownloads,  List<DadosAutor> autores) {
         this.titulo = tiulo;
-        this.idiomas = Idiomas.fromString(idiomas.get(0));
+        this.idiomas = Idiomas.fromString(idiomas.get(0)); // Pega o primeiro idioma da lista de idiomas
         this.numeroDownloads = numeroDownloads;
-        Autor autor = new Autor(autores.get(0).nome(), autores.get(0).anoDeNascimento(), autores.get(0).anoDeFalecimento());
+        Autor autor = new Autor(autores.get(0)
+                .nome(), autores.get(0)
+                .anoDeNascimento(), autores.get(0)
+                .anoDeFalecimento()); // Pega o primeiro autor da lista de autores
         this.autor = autor;
 
         }
 
+    // Construtor com dois parâmetros
     public Livro(Livro dados, Autor autor) {
         this.titulo = dados.titulo;
         this.autor = autor;
@@ -57,7 +66,7 @@ public class Livro {
         this.numeroDownloads = dados.numeroDownloads;
     }
 
-
+    // Construtor padrão
     public Livro(Dados dados) {
 
     }
@@ -82,7 +91,6 @@ public class Livro {
         return autor;
     }
 
-
     public void setAutor(Autor autor) {
         this.autor = autor;
     }
@@ -95,11 +103,11 @@ public class Livro {
         this.idiomas = idioma;
     }
 
-    public Integer getNumeroDownloads() {
+    public Double getNumeroDownloads() {
         return numeroDownloads;
     }
 
-    public void setNumeroDownloads(Integer numeroDownloads) {
+    public void setNumeroDownloads(Double numeroDownloads) {
         this.numeroDownloads = numeroDownloads;
     }
 

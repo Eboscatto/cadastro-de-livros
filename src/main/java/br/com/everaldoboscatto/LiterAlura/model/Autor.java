@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "tb_autores")
+@Table(name = "tb_autores") // Cria a tabela tb_autores no banco de dados
 public class Autor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +13,7 @@ public class Autor {
     private String nome;
     private Integer anoDeNascimento;
     private Integer anoDeFalecimento;
-    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER) // Mapeamento um para muitos
     private List<Livro> livros;
 
     public Autor(){
@@ -21,6 +21,8 @@ public class Autor {
     public Autor(Autor autor){
 
     }
+
+    // Construtor
     public Autor(String nome, Integer anoDeNascimento, Integer anoDeFalecimento){
         this.nome = nome;
         this.anoDeNascimento = anoDeNascimento;
@@ -68,7 +70,6 @@ public class Autor {
     }
 
     public void setLivro(List<Livro> livros) {
-        //livros.forEach(a -> a.setAutor(this));
         this.livros = livros;
     }
 

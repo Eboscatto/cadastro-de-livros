@@ -1,4 +1,6 @@
 package br.com.everaldoboscatto.LiterAlura.model;
+
+// Recebe os dados vindos da API
 public enum Idiomas {
     PORTUGUESE("pt"),
     ESPANISH("es"),

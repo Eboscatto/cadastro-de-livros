@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+// Realiza operações na Entidade Autor
 @Repository
 public interface AutorRepository extends JpaRepository<Autor, Long> {
     List<Autor> findAll();

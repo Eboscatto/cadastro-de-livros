@@ -3,6 +3,7 @@ package br.com.everaldoboscatto.LiterAlura.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+// Recebe os dados vindos da API
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DadosAutor(@JsonAlias("name") String nome,
                          @JsonAlias("birth_year") Integer anoDeNascimento,
