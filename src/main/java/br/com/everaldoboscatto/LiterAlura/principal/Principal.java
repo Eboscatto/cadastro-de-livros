@@ -36,7 +36,8 @@ public class Principal {
                     03 - Listar autores armazenados 
                     04 - Listar autores vivos em um determinado ano 
                     05 - Listar livros em um determinado idioma  
-                    06 - Listar os três livros mais baixados                      
+                    06 - Listar os três livros mais baixados    
+                    07 - Listar autor pelo nome                  
                                       
                     """;
 
@@ -63,6 +64,9 @@ public class Principal {
                     break;
                 case 6:
                     listarTop3Downloads();
+                    break;
+                case 7:
+                    listarAutorPeloNome();
                     break;
                 case 0:
                     System.out.println("\nEncerrando sistema...");
@@ -150,7 +154,7 @@ public class Principal {
         this.repositorio = livroRepository;
         this.autorRepository = autorRepository;
     }
-    // Buscar os espisódios top 3
+    // Listar os 3 livros com maior número de downloads
     private void listarTop3Downloads() {
         List<Livro> livros = repositorio.findAll();
         livros.stream()
@@ -170,6 +174,20 @@ public class Principal {
                         a.getAnoDeFalecimento()));
     }
 
+
+    // Busca autor por um trecho do nome
+    private void listarAutorPeloNome() {
+        System.out.println("Digite um trecho do nome do episódio que deseja buscar");
+        var trechoNomeAutor = leitura.nextLine();
+        List<Autor> autorEncontrado = autorRepository.autorPorTrechoDoNome(trechoNomeAutor);
+        autorEncontrado.forEach(a ->
+                System.out.printf("\nAutor encontrado: %s Autor",
+                        a.getNome()));
+
+        if (autorEncontrado.isEmpty()) {
+            System.out.println("\nNão foi localizado nenhum autor com esse nome!");
+        }
+    }
     // Solicita a entrada de dados pelo usuário
    private int solicitarAno() {
         System.out.println("Digite o ano para o qual deseja saber um autor vivo:");

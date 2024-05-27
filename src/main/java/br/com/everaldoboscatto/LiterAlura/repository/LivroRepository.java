@@ -23,5 +23,4 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
     List<Autor> obterAutoresVivosEmAno(int ano);
 
     List<Livro> findByIdiomas(Idiomas idoma);
-
 }
