@@ -50,7 +50,7 @@ Foram empregadas no projeto as boas práticas recomendadas para o desenvolviment
 Clone o projeto com o comando abaixo:
 ```bash
   # Clone o repositório
-  ❯ git clone https://github.com/Eboscatto/conversor-de-moedas
+  ❯ git clone https://github.com/Eboscatto/cadastro-de-livros
 	# IDE ex.: InetelliJ, VSCode, Eclipse, Visual Studio, etc...
   ❯ Use a IDE de sua preferência para rodar o projeto
 	# Execute o projeto
