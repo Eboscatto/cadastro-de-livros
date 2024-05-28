@@ -60,7 +60,11 @@ Foram empregadas no projeto as boas práticas recomendadas para o desenvolviment
 Clone o projeto com o comando abaixo:
 ```bash
   # Clone o repositório
+<<<<<<< HEAD
   ❯ git clonehttps://github.com/Eboscatto/catalogo-de-livros
+=======
+  ❯ git clone https://github.com/Eboscatto/cadastro-de-livros
+>>>>>>> 7ff7040b8b4fc5e2269f89720fad388b316259b8
 	# IDE ex.: InetelliJ, VSCode, Eclipse, Visual Studio, etc...
   ❯ Use a IDE de sua preferência para rodar o projeto
 	# Execute o projeto
