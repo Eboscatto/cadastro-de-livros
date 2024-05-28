@@ -14,6 +14,7 @@ A interação com o usuário é feita através de um menu de opções, onde o us
 <p>
 Atualmente busca pelos livros na API pode ser feita em quatro idimoas: Português, Inglês, Francês e Espanhol. Os Dados armazenados no Banco de Dados podem ser buscados de diversas maneiras, como por exemplo: Lista de autores, lista de livros, livros mais baixados, etc...
 </p> 
+
 ### Tecnologias Utilizadas:
 Esse projeto foi criado utilizando as seguintes tecnologias:
 ### Sistema Operacional:
@@ -62,9 +63,7 @@ Clone o projeto com o comando abaixo:
   # Clone o repositório
 <<<<<<< HEAD
   ❯ git clonehttps://github.com/Eboscatto/catalogo-de-livros
-=======
-  ❯ git clone https://github.com/Eboscatto/cadastro-de-livros
->>>>>>> 7ff7040b8b4fc5e2269f89720fad388b316259b8
+
 	# IDE ex.: InetelliJ, VSCode, Eclipse, Visual Studio, etc...
   ❯ Use a IDE de sua preferência para rodar o projeto
 	# Execute o projeto
